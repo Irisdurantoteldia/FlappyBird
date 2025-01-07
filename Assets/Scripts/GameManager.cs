@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public TextMeshProUGUI scoreText;
-    public AudioClip pointSound; // Sonido para cada punto agregado
+    public AudioClip pointSound;
     private AudioSource audioSource;
     public int score = 0;
 
@@ -32,12 +32,17 @@ public class GameManager : MonoBehaviour
     {
         score += value;
         UpdateScoreText();
-        // Reproducir el sonido de punto cada vez que se suma un punto
-        audioSource.PlayOneShot(pointSound);
+        if (audioSource != null && pointSound != null)
+        {
+            audioSource.PlayOneShot(pointSound);
+        }
     }
 
     void UpdateScoreText()
     {
-        scoreText.text = score.ToString();
+        if (scoreText != null)
+        {
+            scoreText.text = score.ToString();
+        }
     }
 }

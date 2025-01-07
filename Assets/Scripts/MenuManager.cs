@@ -10,7 +10,11 @@ public class MenuManager : MonoBehaviour
     public GameObject inGameMenu;
     public GameObject gameOverMenu;
     public TextMeshProUGUI scoreText;
-    public AudioClip gameOverSound; // Sonido para el Game Over
+    
+    // Sons públics per assignar-los des de l'inspector
+    public AudioClip gameOverSound; 
+    public AudioClip pointSound; // Sonido del punt
+    public AudioClip backgroundMusic; // Música de fons
     private AudioSource audioSource;
 
     void Awake()
@@ -27,38 +31,41 @@ public class MenuManager : MonoBehaviour
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>(); // Obtener el componente AudioSource
+        audioSource = GetComponent<AudioSource>();
+        PlayBackgroundMusic(); // Reproducir música de fons en iniciar el joc
         ShowStartMenu();
     }
 
     public void ShowStartMenu()
     {
-        startMenu.SetActive(true);
-        inGameMenu.SetActive(false);
-        gameOverMenu.SetActive(false);
+        startMenu?.SetActive(true);
+        inGameMenu?.SetActive(false);
+        gameOverMenu?.SetActive(false);
         Time.timeScale = 0f;
     }
 
     public void HideStartMenu()
     {
-        startMenu.SetActive(false);
+        startMenu?.SetActive(false);
         Time.timeScale = 1f;
     }
 
     public void StartGame()
     {
-        inGameMenu.SetActive(true);
+        inGameMenu?.SetActive(true);
     }
 
     public void ShowGameOverMenu()
     {
-        inGameMenu.SetActive(false);
-        gameOverMenu.SetActive(true);
-        scoreText.text = GameManager.Instance.score.ToString();
+        inGameMenu?.SetActive(false);
+        gameOverMenu?.SetActive(true);
+        if (scoreText != null) scoreText.text = GameManager.Instance.score.ToString();
         Time.timeScale = 0f;
-        
-        // Reproducir el sonido de Game Over
-        audioSource.PlayOneShot(gameOverSound);
+
+        if (audioSource != null && gameOverSound != null)
+        {
+            audioSource.PlayOneShot(gameOverSound); // Reproducir sonido de Game Over
+        }
     }
 
     public void RestartGame()
@@ -68,8 +75,26 @@ public class MenuManager : MonoBehaviour
 
     public void HideGameOverMenu()
     {
-        gameOverMenu.SetActive(false);
+        gameOverMenu?.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    public void PlayPointSound()
+    {
+        if (audioSource != null && pointSound != null)
+        {
+            audioSource.PlayOneShot(pointSound); // Reproducir sonido de Punt
+        }
+    }
+
+    public void PlayBackgroundMusic()
+    {
+        if (audioSource != null && backgroundMusic != null)
+        {
+            audioSource.loop = true; // Loop per la música de fons
+            audioSource.clip = backgroundMusic;
+            audioSource.Play();
+        }
     }
 
     void Update()

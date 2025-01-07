@@ -4,35 +4,56 @@ using UnityEngine;
 
 public class ObstacleSpawner : MonoBehaviour
 {
-    public GameObject obstaclePrefab; // Prefab del obstáculo
-    public float spawnRate = 2f; // Tasa de generación de obstáculos (en segundos)
-    public float spawnHeightRange = 4f; // Rango de altura de generación de obstáculos
-    private float nextSpawnTime;
+    public GameObject obstaclePrefab; // Prefab de l'obstacle
+    public float spawnRate = 6f; // Interval de generació (segons)
+    public float spawnHeightMin = 0f; // Alçada mínima de generació
+    public float spawnHeightMax = 0;  // Alçada màxima de generació
+    private float nextSpawnTime; // Temps per al pròxim spawn
 
     void Start()
     {
-        // Generar el primer obstáculo al iniciar el juego
+        // Comprova que obstaclePrefab està assignat
+        if (obstaclePrefab == null)
+        {
+            Debug.LogError("ObstaclePrefab no està assignat al Inspector. Assigna un prefab per continuar.");
+            return;
+        }
+
+        // Generar el primer obstacle
         SpawnObstacle();
-        // Calcular el tiempo para el próximo obstáculo
         nextSpawnTime = Time.time + spawnRate;
     }
 
     void Update()
     {
-        // Verificar si es el momento de generar un nuevo obstáculo
+        // Si s'ha arribat al temps de spawn, generar un nou obstacle
         if (Time.time >= nextSpawnTime)
         {
             SpawnObstacle();
-            // Calcular el tiempo para el próximo obstáculo
             nextSpawnTime = Time.time + spawnRate;
         }
     }
 
     void SpawnObstacle()
     {
-        // Calcular una posición vertical aleatoria para el obstáculo dentro del rango definido
-        float spawnPosY = Random.Range(-spawnHeightRange, spawnHeightRange);
-        // Generar un nuevo obstáculo en la posición del spawner con la posición vertical aleatoria
-        Instantiate(obstaclePrefab, new Vector3(transform.position.x, spawnPosY, 0), Quaternion.identity);
+        // Comprovar que el prefab no és nul abans d'intentar instanciar-lo
+        if (obstaclePrefab != null)
+        {
+            float spawnPosY = Random.Range(spawnHeightMin, spawnHeightMax);
+            Instantiate(obstaclePrefab, new Vector3(transform.position.x, spawnPosY, 0), Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogError("ObstaclePrefab és nul en temps d'execució. Assegura't que el prefab no ha estat destruït.");
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Afegeix un log si el prefab està destruït al destruir aquest spawner
+        if (obstaclePrefab == null)
+        {
+            Debug.LogWarning("ObstaclePrefab s'ha destruït quan ObstacleSpawner s'ha destruït.");
+        }
     }
 }
